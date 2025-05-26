@@ -22,7 +22,7 @@ export default function Hero() {
           className="w-full object-contain mb-2"
         />
         <h2 className="text-4xl font-bold text-white">
-          Payez vos factures en ligne facilement avec AREGIE
+          EMANNUEL Paye TES factures en ligne facilement avec AREGIE
         </h2>
         <button
           className="bg-blue-600 w-full mt-8 cursor-pointer hover:bg-blue-700 text-white font-bold py-3 px-6 rounded transition"
