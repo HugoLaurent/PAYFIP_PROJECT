@@ -12,12 +12,12 @@ export default function IconButton({
   type = "button",
 }) {
   const baseColor = {
-    blue: "bg-blue-600 hover:bg-blue-700 text-white",
-    green: "bg-green-600 hover:bg-green-700 text-white",
-    red: "bg-red-600 hover:bg-red-700 text-white",
-    gray: "bg-gray-600 hover:bg-gray-700 text-white",
+    blue: "w-full bg-blue-600 hover:bg-blue-700 text-white",
+    green: "w-full bg-green-600 hover:bg-green-700 text-white",
+    red: "w-full bg-red-600 hover:bg-red-700 text-white",
+    gray: "w-full bg-gray-600 hover:bg-gray-700 text-white",
     transparent:
-      "bg-transparent hover:bg-gray-100 text-gray-800 hover:text-gray-900",
+      "w-full bg-transparent hover:bg-gray-100 text-gray-800 hover:text-gray-900",
   };
 
   return (
@@ -26,7 +26,7 @@ export default function IconButton({
       onClick={onClick}
       disabled={disabled || isLoading}
       className={cn(
-        "w-full flex items-center justify-center py-2 rounded transition font-medium",
+        "flex items-center cursor-pointer justify-center py-2 rounded transition font-medium",
         baseColor[color],
         isLoading && "opacity-60 cursor-not-allowed",
         className
