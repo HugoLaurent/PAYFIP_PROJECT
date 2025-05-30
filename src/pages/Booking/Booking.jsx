@@ -6,7 +6,7 @@ export default function Booking({ data }) {
   const { description } = data;
 
   const [step, setStep] = useState(0);
-  const steps = ["Email", "Tickets", "Date", "Confirmation"];
+  const steps = ["Email", "Tickets", "Date", "Paiement", "Confirmation"];
 
   return (
     <main className="flex flex-col gap-8 max-w-lg mx-auto py-8">
@@ -24,7 +24,7 @@ export default function Booking({ data }) {
       </Motion.div>
 
       {/* ProgressBar rendue ici */}
-      {step !== 3 && (
+      {step !== 4 && (
         <ProgressBar currentStep={step + 1} steps={steps} statusTitre={false} />
       )}
 

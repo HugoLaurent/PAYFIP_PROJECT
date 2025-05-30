@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, Calendar, Users, Download } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-
-import { useQrCode } from "@/hooks"; // import via index.js
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PDFTicket from "./../../lib/PDFTIcket";
+import { useQrCode } from "@/hooks";
 
 export default function TicketConfirmation({
   email,
@@ -14,6 +15,7 @@ export default function TicketConfirmation({
   onReset,
 }) {
   const [confirmationNumber, setConfirmationNumber] = useState("");
+  const hasSent = useRef(false);
 
   const tickets = Object.entries(formData)
     .filter(([, qty]) => qty > 0)
@@ -47,6 +49,54 @@ export default function TicketConfirmation({
 
   const qrCodeUrl = useQrCode(qrContent);
 
+  useEffect(() => {
+    if (!qrCodeUrl || hasSent.current) return;
+    hasSent.current = true;
+
+    const sendTicketToBackend = async () => {
+      const response = await fetch(qrCodeUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const base64QrCode = reader.result;
+
+        const billetsText = tickets
+          .map(
+            (ticket) =>
+              `${ticket.quantity} × ${ticket.type} — ${(
+                ticket.price * ticket.quantity
+              ).toFixed(2)} €`
+          )
+          .join("<br>");
+
+        try {
+          await fetch("/api/send-ticket", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              dataId: data.id,
+              email,
+              confirmation: confirmationNumber,
+              date_visite: format(date, "EEEE d MMMM yyyy", { locale: fr }),
+              billets: billetsText,
+              total: totalPrice.toFixed(2),
+              qr_code_base64: base64QrCode,
+            }),
+          });
+        } catch (error) {
+          console.error("Erreur d'envoi au backend :", error);
+        }
+      };
+
+      reader.readAsDataURL(blob);
+    };
+
+    sendTicketToBackend();
+  }, [qrCodeUrl]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -54,7 +104,7 @@ export default function TicketConfirmation({
       transition={{ duration: 0.5 }}
       className="max-w-md mx-auto p-6 bg-white shadow rounded-lg"
     >
-      <div className="text-center mb-6">
+      <div id="ticket-to-download" className="text-center mb-6">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -149,13 +199,27 @@ export default function TicketConfirmation({
       )}
 
       <div className="flex flex-col sm:flex-row justify-between gap-3 mt-6">
-        <button
-          onClick={() => alert("Téléchargement fictif")}
+        <PDFDownloadLink
+          document={
+            <PDFTicket
+              email={email}
+              date={date}
+              tickets={tickets}
+              confirmationNumber={confirmationNumber}
+              totalPrice={totalPrice}
+              qrCodeUrl={qrCodeUrl}
+            />
+          }
+          fileName="ticket.pdf"
           className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100"
         >
-          <Download className="h-4 w-4 mr-2" />
-          Télécharger les billets
-        </button>
+          {({ loading }) => (
+            <>
+              <Download className="h-4 w-4 mr-2" />
+              {loading ? "Préparation..." : "Télécharger les billets"}
+            </>
+          )}
+        </PDFDownloadLink>
         <button
           onClick={onReset}
           className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"

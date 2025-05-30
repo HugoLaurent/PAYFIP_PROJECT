@@ -20,7 +20,7 @@ function ProgressBar({ currentStep, statusTitre, steps }) {
       </div>
 
       {/* Indicateurs visuels pour chaque étape */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
         {steps.map((label, index) => {
           const stepNumber = index + 1;
           const completed = stepNumber < currentStep;

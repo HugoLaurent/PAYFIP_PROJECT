@@ -3,7 +3,7 @@ import { CheckCircle, Mail, RefreshCcw } from "lucide-react";
 
 import { CodeInput, IconButton } from "@/components";
 
-export default function EmailVerification({ onVerified }) {
+export default function EmailVerification({ data, onVerified }) {
   const [email, setEmail] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [codeInput, setCodeInput] = useState("");
@@ -13,35 +13,58 @@ export default function EmailVerification({ onVerified }) {
   const [isSending, setIsSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const sendCode = () => {
+  const sendCode = async () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError("Adresse email invalide");
       return;
     }
     setIsSending(true);
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/send-mail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: data?.id, email }),
+      });
+
+      const result = await res.json();
+      console.log("Réponse du backend :", result);
+
+      // Simuler le code (pour la démo)
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
       setGeneratedCode(code);
       setCodeSent(true);
       setError("");
       console.log("Code envoyé (démo) :", code);
+    } catch (err) {
+      console.error("Erreur envoi mail:", err);
+      setError("Impossible d’envoyer le code. Réessayez plus tard.");
+    } finally {
       setIsSending(false);
-    }, 1000);
+    }
   };
 
-  const verifyCode = () => {
+  const verifyCode = async () => {
     setIsVerifying(true);
-    setTimeout(() => {
-      if (codeInput === generatedCode) {
+    try {
+      const res = await fetch("/api/check-mail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: codeInput }),
+      });
+
+      if (res.ok) {
+        // Succès : on peut avancer
         setVerified(true);
-        setTimeout(() => {
-          onVerified?.(email);
-        }, 1000);
+        setTimeout(() => onVerified?.(email), 1000);
       } else {
-        setError("Code incorrect");
+        const data = await res.json();
+        setError(data.error || "Code incorrect");
       }
+    } catch (err) {
+      setError("Erreur lors de la vérification. Réessayez.");
+    } finally {
       setIsVerifying(false);
-    }, 800);
+    }
   };
 
   if (verified) {

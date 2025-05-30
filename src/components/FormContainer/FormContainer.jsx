@@ -15,7 +15,6 @@ export default function FormContainer({ setServiceData }) {
         setMode(data.type);
         setLocalData(data);
         setServiceData(data);
-        console.log("Data fetched:", data);
       } catch {
         // handle error
       } finally {

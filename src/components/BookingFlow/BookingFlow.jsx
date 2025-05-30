@@ -1,23 +1,44 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import {
   EmailVerification,
   TicketSelection,
   DateSelection,
   TicketConfirmation,
+  WaitingForPayment,
+  PayfipStep,
 } from "@/components";
 
 export default function BookingFlow({ step, setStep, data }) {
   const [formData, setFormData] = useState(
     Object.fromEntries(Object.keys(data).map((key) => [`nb_${key}`, 0]))
   );
+
   const [email, setEmail] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(null);
+  const [idop, setIdop] = useState(null);
+
+  // Lancer polling une fois idop dispo et à l'étape 3
+  useEffect(() => {
+    if (!idop || step !== 3) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/payment-status/${idop}`);
+        if (res.status === 200) {
+          clearInterval(interval);
+          setStep(4);
+        }
+      } catch (err) {
+        console.error("Erreur polling :", err);
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [idop, step]);
 
   return (
     <div>
       {step === 0 && (
         <EmailVerification
+          data={data}
           onVerified={(userEmail) => {
             setEmail(userEmail);
             setStep(1);
@@ -44,6 +65,31 @@ export default function BookingFlow({ step, setStep, data }) {
       )}
 
       {step === 3 && (
+        <PayfipStep
+          data={data}
+          email={email}
+          date={date}
+          tickets={Object.entries(formData)
+            .filter(([, qty]) => qty > 0)
+            .map(([key, qty]) => ({
+              type: key.replace("nb_", ""),
+              quantity: qty,
+              price: data.prix[key.replace("nb_", "")] || 0,
+            }))}
+          totalPrice={Object.entries(formData).reduce((acc, [key, qty]) => {
+            const type = key.replace("nb_", "");
+            return acc + (data.prix[type] || 0) * qty;
+          }, 0)}
+          onBack={() => setStep(2)}
+          onReadyToPay={(receivedIdop) => setIdop(receivedIdop)}
+        />
+      )}
+
+      {step === 4 && idop && (
+        <WaitingForPayment idop={idop} onSuccess={() => setStep(5)} />
+      )}
+
+      {step === 5 && (
         <TicketConfirmation
           email={email}
           date={date}
@@ -58,11 +104,10 @@ export default function BookingFlow({ step, setStep, data }) {
             );
             setDate("");
             setEmail("");
+            setIdop(null);
           }}
         />
       )}
-
-      {/* Navigation */}
     </div>
   );
 }
