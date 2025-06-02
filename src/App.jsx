@@ -1,8 +1,9 @@
 import { Routes, Route } from "react-router";
 import { useState } from "react";
 import "./App.css";
-import { Home } from "@/pages";
+import { Home, Dashboard } from "@/pages";
 import { Header, FormContainer, LoginForm, Footer } from "@/components";
+import Test from "./pages/Test/Test";
 
 function App() {
   const [serviceData, setServiceData] = useState(null);
@@ -21,6 +22,8 @@ function App() {
             element={<FormContainer setServiceData={setServiceData} />}
           />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/test" element={<Test />} />
         </Routes>
       </section>
       <Footer url={serviceData?.url} />

@@ -2,8 +2,10 @@ import { useState } from "react";
 import { CheckCircle, Mail, Lock, LogIn, RefreshCcw } from "lucide-react";
 import { IconButton, CodeInput } from "@/components";
 import { motion as Motion } from "framer-motion";
+import { useNavigate } from "react-router";
 
 export default function LoginForm() {
+  const Navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [step, setStep] = useState(0); // 0: envoi code, 1: vérification code, 2: mot de passe
   const [generatedCode, setGeneratedCode] = useState("");
@@ -73,13 +75,14 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const res = await fetch("/api/login", {
+      const res = await fetch("/api/connexion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ mail: email, password }),
       });
 
       if (res.ok) {
+        Navigate("/dashboard");
         setSuccess(true);
       } else {
         const data = await res.json();
@@ -91,16 +94,6 @@ export default function LoginForm() {
       setIsSubmitting(false);
     }
   };
-
-  if (success) {
-    return (
-      <div className="flex flex-col items-center p-6 text-center">
-        <LogIn className="w-12 h-12 text-green-500 mb-2" />
-        <h2 className="text-xl font-bold text-gray-900">Connexion réussie !</h2>
-        <p className="text-gray-600 mt-2">Bienvenue.</p>
-      </div>
-    );
-  }
 
   return (
     <main className="flex flex-col gap-8 max-w-lg mx-auto py-8">
