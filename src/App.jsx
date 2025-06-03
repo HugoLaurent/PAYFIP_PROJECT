@@ -1,11 +1,12 @@
-import { Routes, Route } from "react-router";
+import { Routes, Route, useNavigate } from "react-router";
 import { useState } from "react";
 import "./App.css";
-import { Home, Dashboard, Legal } from "@/pages";
+import { Home, Dashboard, Legal, Page404 } from "@/pages";
 import { Header, FormContainer, LoginForm, Footer } from "@/components";
 import Test from "./pages/Test/Test";
 
 function App() {
+  const Navigate = useNavigate();
   const [serviceData, setServiceData] = useState(null);
 
   return (
@@ -24,6 +25,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/test" element={<Test />} />
           <Route path="/mentions-legales" element={<Legal />} />
+          <Route path="/404" element={<Page404 />} />
+          <Route path="*" element={<Navigate to="/404" />} />
         </Routes>
       </section>
 
