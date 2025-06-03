@@ -2,7 +2,13 @@ import { Routes, Route, useNavigate } from "react-router";
 import { useState } from "react";
 import "./App.css";
 import { Home, Dashboard, Legal, Page404 } from "@/pages";
-import { Header, FormContainer, LoginForm, Footer } from "@/components";
+import {
+  Header,
+  FormContainer,
+  LoginForm,
+  Footer,
+  FeedbackPayfip,
+} from "@/components";
 import Test from "./pages/Test/Test";
 
 function App() {
@@ -25,6 +31,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/test" element={<Test />} />
           <Route path="/mentions-legales" element={<Legal />} />
+          <Route path="/feedback" element={<FeedbackPayfip />} />
+
           <Route path="/404" element={<Page404 />} />
           <Route path="*" element={<Navigate to="/404" />} />
         </Routes>

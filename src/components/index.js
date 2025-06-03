@@ -12,3 +12,4 @@ export { default as WaitingForPayment } from "./WaitingForPayment/WaitingForPaym
 export { default as Footer } from "./Footer/Footer";
 export { default as TicketConfirmation } from "./TicketConfirmation/TicketConfirmation";
 export { default as LoginForm } from "./LoginForm/LoginForm";
+export { default as FeedbackPayfip } from "./FeedbackPayfip/FeedbackPayfip";

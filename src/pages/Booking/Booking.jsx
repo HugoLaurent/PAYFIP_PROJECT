@@ -5,7 +5,7 @@ import { ProgressBar, BookingFlow } from "@/components";
 export default function Booking({ data }) {
   const { description } = data;
 
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const steps = ["Email", "Tickets", "Date", "Paiement", "Confirmation"];
 
   return (
