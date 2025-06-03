@@ -8,11 +8,12 @@ export default function FormContainer({ setServiceData }) {
   const [mode, setMode] = useState(null); // 'billeterie' | 'facture'
   const [localData, setLocalData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const API_BASE = import.meta.env.VITE_URL_API;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`/api/service/${orgName}`);
+        const res = await fetch(`${API_BASE}/service/${orgName}`);
         const data = await res.json();
 
         if (data?.code === 0) {
