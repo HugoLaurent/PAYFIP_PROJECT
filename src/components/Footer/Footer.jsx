@@ -1,7 +1,8 @@
 import { IconButton } from "@/components";
+import { useNavigate } from "react-router";
 
-export default function Footer({ url }) {
-  console.log(url);
+export default function Footer() {
+  const navigate = useNavigate();
 
   return (
     <footer className="bg-gray-100 text-center p-4 mt-8">
@@ -14,11 +15,15 @@ export default function Footer({ url }) {
           AREGIE
         </a>
       </p>
+      <p>
+        <a href="/mentions-legales" target="_blank" rel="noopener noreferrer">
+          Mentions légales et conditions d'utilisation.
+        </a>
+      </p>
+
       <IconButton
         className="w-2"
-        onClick={() => {
-          window.location.href = `/${url}/gestion`;
-        }}
+        onClick={() => navigate("/login")}
         color="transparent"
       >
         Je suis un professionnel

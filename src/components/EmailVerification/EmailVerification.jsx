@@ -125,9 +125,7 @@ export default function EmailVerification({ data, onVerified }) {
           >
             Vérifier le code
           </IconButton>
-          <p className="text-xs text-gray-500 mt-3 text-center flex items-center justify-center">
-            <Mail className="w-4 h-4 mr-1" /> Code pour démo : {generatedCode}
-          </p>
+
           <div className="text-center mt-3">
             <IconButton
               onClick={() => {

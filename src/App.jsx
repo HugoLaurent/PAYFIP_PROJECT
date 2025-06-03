@@ -1,13 +1,12 @@
 import { Routes, Route } from "react-router";
 import { useState } from "react";
 import "./App.css";
-import { Home, Dashboard } from "@/pages";
+import { Home, Dashboard, Legal } from "@/pages";
 import { Header, FormContainer, LoginForm, Footer } from "@/components";
 import Test from "./pages/Test/Test";
 
 function App() {
   const [serviceData, setServiceData] = useState(null);
-  console.log("Service Data:", serviceData);
 
   return (
     <div
@@ -24,8 +23,10 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/test" element={<Test />} />
+          <Route path="/mentions-legales" element={<Legal />} />
         </Routes>
       </section>
+
       <Footer url={serviceData?.url} />
     </div>
   );

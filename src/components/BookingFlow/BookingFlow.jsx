@@ -20,12 +20,12 @@ export default function BookingFlow({ step, setStep, data }) {
   // Lancer polling une fois idop dispo et à l'étape 3
   useEffect(() => {
     if (!idop || step !== 3) return;
+    setStep(4);
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/payment-status/${idop}`);
         if (res.status === 200) {
           clearInterval(interval);
-          setStep(4);
         }
       } catch (err) {
         console.error("Erreur polling :", err);

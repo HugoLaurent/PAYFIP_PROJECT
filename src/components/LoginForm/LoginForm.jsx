@@ -154,9 +154,7 @@ export default function LoginForm() {
             >
               Vérifier le code
             </IconButton>
-            <p className="text-xs text-gray-500 mt-3 text-center flex items-center justify-center">
-              Code de démo : {generatedCode}
-            </p>
+
             <div className="text-center mt-3">
               <IconButton
                 onClick={() => {
