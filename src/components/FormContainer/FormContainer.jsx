@@ -13,7 +13,14 @@ export default function FormContainer({ setServiceData }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${API_BASE}/service/${orgName}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_URL_API}/service/${orgName}`,
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
+        );
         const data = await res.json();
 
         if (data?.code === 0) {
