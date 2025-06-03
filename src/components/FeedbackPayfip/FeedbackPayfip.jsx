@@ -5,6 +5,14 @@ export default function FeedbackPayfip() {
   const step = searchParams.get("step");
   const idop = searchParams.get("idop");
 
+  fetch("/api/test", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ idOp: idop }),
+  });
+
   return (
     <div className="p-8 max-w-xl mx-auto text-center">
       <h1 className="text-3xl font-bold mb-4">Retour de paiement</h1>
