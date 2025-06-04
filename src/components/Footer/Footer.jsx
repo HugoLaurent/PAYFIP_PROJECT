@@ -3,7 +3,12 @@ import { useNavigate } from "react-router";
 
 export default function Footer() {
   const navigate = useNavigate();
-
+  if (
+    (location.pathname === "/404") |
+    (location.pathname === "/500") |
+    (location.pathname === "/")
+  )
+    return null;
   return (
     <footer className="bg-gray-100 text-center p-4 mt-8">
       <p className="text-gray-600 mb-2">

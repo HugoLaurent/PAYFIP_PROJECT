@@ -24,7 +24,7 @@ export default function FormContainer({ setServiceData }) {
         setLocalData(data);
         setServiceData(data);
       } catch {
-        console.error("Erreur lors de la récupération du service");
+        navigate("/500"); // ✅ ici, en cas d'erreur
       } finally {
         setLoading(false);
       }

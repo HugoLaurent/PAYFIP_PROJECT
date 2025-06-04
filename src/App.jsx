@@ -1,7 +1,7 @@
 import { Routes, Route, useNavigate } from "react-router";
 import { useState } from "react";
 import "./App.css";
-import { Home, Dashboard, Legal, Page404 } from "@/pages";
+import { Home, Dashboard, Legal, Page404, Error500 } from "@/pages";
 import {
   Header,
   FormContainer,
@@ -32,7 +32,7 @@ function App() {
           <Route path="/test" element={<Test />} />
           <Route path="/mentions-legales" element={<Legal />} />
           <Route path="/feedback" element={<TicketConfirmation />} />
-
+          <Route path="/500" element={<Error500 />} />
           <Route path="/404" element={<Page404 />} />
           <Route path="*" element={<Navigate to="/404" />} />
         </Routes>
