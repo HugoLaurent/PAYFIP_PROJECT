@@ -7,7 +7,7 @@ import {
   FormContainer,
   LoginForm,
   Footer,
-  FeedbackPayfip,
+  TicketConfirmation,
 } from "@/components";
 import Test from "./pages/Test/Test";
 
@@ -31,7 +31,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/test" element={<Test />} />
           <Route path="/mentions-legales" element={<Legal />} />
-          <Route path="/feedback" element={<FeedbackPayfip />} />
+          <Route path="/feedback" element={<TicketConfirmation />} />
 
           <Route path="/404" element={<Page404 />} />
           <Route path="*" element={<Navigate to="/404" />} />
