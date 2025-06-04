@@ -8,8 +8,7 @@ import { fr } from "date-fns/locale";
 export default function TicketConfirmation(props) {
   const [searchParams] = useSearchParams();
   const idopFromUrl = searchParams.get("idop");
-  const stepFromUrl = searchParams.get("step");
-  const isFromRedirect = stepFromUrl === "5" && idopFromUrl;
+  console.log("IDOP from URL:", idopFromUrl);
 
   const [email, setEmail] = useState(props.email || "");
   const [date, setDate] = useState(props.date || null);
@@ -17,69 +16,28 @@ export default function TicketConfirmation(props) {
   const [totalPrice, setTotalPrice] = useState(0);
   const [confirmationNumber, setConfirmationNumber] = useState("");
 
-  const mockData = {
-    email: "jean.dupont@example.com",
-    date: new Date("2025-07-14"),
-    formData: {
-      nb_adulte: 2,
-      nb_enfant: 1,
-      nb_etudiant: 0,
-    },
-    data: {
-      prix: {
-        adulte: 10,
-        enfant: 5,
-        etudiant: 7,
-      },
-    },
-  };
-
   useEffect(() => {
-    if (isFromRedirect) {
-      const fetchTicketData = async () => {
-        try {
-          const res = await fetch(`/api/test`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ idOp: idopFromUrl }),
-          });
-          if (!res.ok) throw new Error("Erreur serveur");
-          const data = await res.json();
-          setEmail(data.email);
-          setDate(new Date(data.date));
-          setTickets(data.tickets);
-          setTotalPrice(data.total);
-          setConfirmationNumber(data.confirmation);
-        } catch (error) {
-          console.error("Erreur récupération ticket :", error);
-        }
-      };
-      fetchTicketData();
-    } else {
-      const propsTickets = Object.entries(props.formData || {})
-        .filter(([, qty]) => qty > 0)
-        .map(([key, qty]) => {
-          const type = key.replace("nb_", "");
-          return {
-            type,
-            quantity: qty,
-            price: props.data?.prix?.[type] || 0,
-          };
+    const fetchTicketData = async () => {
+      try {
+        const res = await fetch(`/api/test`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ idOp: idopFromUrl }),
         });
-
-      const total = propsTickets.reduce(
-        (acc, t) => acc + t.price * t.quantity,
-        0
-      );
-
-      setTickets(propsTickets);
-      setTotalPrice(total);
-      setConfirmationNumber(
-        Math.random().toString(36).substring(2, 8).toUpperCase()
-      );
-    }
+        if (!res.ok) throw new Error("Erreur serveur");
+        const data = await res.json();
+        setEmail(data.email);
+        setDate(new Date(data.date));
+        setTickets(data.tickets);
+        setTotalPrice(data.total);
+        setConfirmationNumber(data.confirmation);
+      } catch (error) {
+        console.error("Erreur récupération ticket :", error);
+      }
+    };
+    fetchTicketData();
   }, []);
 
   return (
@@ -133,6 +91,23 @@ export default function TicketConfirmation(props) {
           <Users className="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
           <div className="flex-1">
             <h3 className="font-medium text-gray-900">Billets</h3>
+            <ul className="mt-1 text-gray-600 space-y-1">
+              {Object.entries(
+                tickets.reduce((acc, ticket) => {
+                  const key = ticket.type;
+                  if (!acc[key]) acc[key] = { count: 0, type: ticket.type };
+                  acc[key].count++;
+                  return acc;
+                }, {})
+              ).map(([type, { count }]) => (
+                <li key={type}>
+                  {count} × {type}
+                </li>
+              ))}
+              <li className="font-medium text-gray-900 border-t border-gray-200 pt-2">
+                Total : {totalPrice.toFixed(2)} €
+              </li>
+            </ul>
           </div>
         </div>
 
