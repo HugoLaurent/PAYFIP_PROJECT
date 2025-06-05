@@ -71,14 +71,20 @@ export default function BookingFlow({ step, setStep, data }) {
           date={date}
           tickets={Object.entries(formData)
             .filter(([, qty]) => qty > 0)
-            .map(([key, qty]) => ({
-              type: key.replace("nb_", ""),
-              quantity: qty,
-              price: data.prix[key.replace("nb_", "")] || 0,
-            }))}
+            .map(([key, qty]) => {
+              const type = key.replace("nb_", "");
+              const rawPrice = data.prix[type];
+              const price = parseFloat(rawPrice);
+              return {
+                type,
+                quantity: qty,
+                price: isNaN(price) ? 0 : price,
+              };
+            })}
           totalPrice={Object.entries(formData).reduce((acc, [key, qty]) => {
             const type = key.replace("nb_", "");
-            return acc + (data.prix[type] || 0) * qty;
+            const price = parseFloat(data.prix[type]);
+            return acc + (isNaN(price) ? 0 : price * qty);
           }, 0)}
           onBack={() => setStep(2)}
           onReadyToPay={(receivedIdop) => setIdop(receivedIdop)}

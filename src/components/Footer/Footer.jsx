@@ -10,29 +10,18 @@ export default function Footer() {
   )
     return null;
   return (
-    <footer className="bg-gray-100 text-center p-4 mt-8">
-      <p className="text-gray-600 mb-2">
+    <footer className="bg-gray-100 text-center p-4 mt-8 flex justify-between items-center ">
+      <p className="text-gray-600 ">
         © {new Date().getFullYear()} AREGIE. Tous droits réservés.
       </p>
-      <p>
-        Un service de billetterie sécurisé proposé par{" "}
-        <a href="https://aregie.fr" target="_blank" rel="noopener noreferrer">
-          AREGIE
-        </a>
-      </p>
-      <p>
+      <div className="flex items-center gap-4">
         <a href="/mentions-legales" target="_blank" rel="noopener noreferrer">
           Mentions légales et conditions d'utilisation.
         </a>
-      </p>
-
-      <IconButton
-        className="w-2"
-        onClick={() => navigate("/login")}
-        color="transparent"
-      >
-        Je suis un professionnel
-      </IconButton>
+        <a className=" text-blue-600 hover:underline" href="/login">
+          Je suis un professionnel
+        </a>
+      </div>
     </footer>
   );
 }
