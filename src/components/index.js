@@ -13,3 +13,4 @@ export { default as Footer } from "./Footer/Footer";
 export { default as TicketConfirmation } from "./TicketConfirmation/TicketConfirmation";
 export { default as LoginForm } from "./LoginForm/LoginForm";
 export { default as FeedbackPayfip } from "./FeedbackPayfip/FeedbackPayfip";
+export { default as Loader } from "./Loader/Loader";

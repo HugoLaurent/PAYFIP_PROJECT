@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Booking } from "@/pages";
 import { useNavigate } from "react-router";
-
+import { Loader } from "@/components";
 export default function FormContainer({ setServiceData }) {
   const navigate = useNavigate(); // ✅ ici
   const orgName = window.location.pathname.split("/")[1];
@@ -33,7 +33,7 @@ export default function FormContainer({ setServiceData }) {
     fetchData();
   }, [orgName, setServiceData, navigate]);
 
-  if (loading) return <div>Chargement...</div>;
+  if (loading) return <Loader />;
   if (!mode) return <div>Erreur de chargement</div>;
 
   return (
