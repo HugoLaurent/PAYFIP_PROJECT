@@ -3,8 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle2, Calendar, Users, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
-import { fr, id } from "date-fns/locale";
-import { IconButton } from "@/components";
+import { fr } from "date-fns/locale";
+import { IconButton, Loader } from "@/components";
 
 export default function TicketConfirmation(props) {
   const [searchParams] = useSearchParams();
@@ -16,23 +16,30 @@ export default function TicketConfirmation(props) {
   const [totalPrice, setTotalPrice] = useState(0);
   const [confirmationNumber, setConfirmationNumber] = useState("");
   const [errorCode, setErrorCode] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGlobalLoading, setIsGlobalLoading] = useState(false);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
+
   const [idop, setIdop] = useState("");
 
   const fetchTicketData = async () => {
+    setIsGlobalLoading(true);
     try {
-      const res = await fetch(`/api/test`, {
+      const res = await fetch("/api/validation-retour", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idOp: idopFromUrl }),
       });
+
+      if (res.status === 404) {
+        setErrorCode(404);
+        return;
+      }
 
       if (res.status === 422) {
         setErrorCode(422);
         return;
       }
+
       if (!res.ok) throw new Error("Erreur serveur");
 
       const data = await res.json();
@@ -44,34 +51,71 @@ export default function TicketConfirmation(props) {
     } catch (error) {
       console.error("Erreur récupération ticket :", error);
       setErrorCode(500);
+    } finally {
+      setIsGlobalLoading(false);
     }
   };
+
   useEffect(() => {
     fetchTicketData();
   }, []);
 
   const handleValidateReservation = async () => {
-    setIsLoading(true);
+    setIsButtonLoading(true);
     try {
       const res = await fetch("/api/try-again", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          idOp: idopFromUrl,
-        }),
+        body: JSON.stringify({ idOp: idopFromUrl }),
       });
 
       if (!res.ok) throw new Error("Erreur lors de la validation.");
-      const data = await res.json();
 
-      setIdop(data);
-      console.log("IDOP récupéré :", data);
+      const newIdop = await res.json();
+      setIdop(newIdop);
     } catch (err) {
       console.error("Erreur :", err);
+      setErrorCode(500);
     } finally {
-      setIsLoading(false);
+      setIsButtonLoading(false);
     }
   };
+
+  const handleDownloadTickets = async () => {
+    const res = await fetch("/api/test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirmationNumber: confirmationNumber }),
+    });
+    if (!res.ok) {
+      console.error("Erreur lors de la récupération des billets.");
+      return;
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `billets-${confirmationNumber}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  if (isGlobalLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md mx-auto p-6 bg-white shadow rounded-lg mt-4"
+      >
+        <div className="text-center">
+          <Loader />
+        </div>
+      </motion.div>
+    );
+  }
 
   if (errorCode === 422) {
     return (
@@ -81,7 +125,7 @@ export default function TicketConfirmation(props) {
         transition={{ duration: 0.5 }}
         className="max-w-md mx-auto p-6 bg-white shadow border border-red-300 rounded-lg mt-4"
       >
-        <div className="text-center ">
+        <div className="text-center">
           <motion.div
             initial={{ rotate: 0, scale: 0 }}
             animate={{ rotate: [0, -10, 10, -10, 10, 0], scale: 1 }}
@@ -96,11 +140,11 @@ export default function TicketConfirmation(props) {
             paiement ou réessayer ultérieurement.
           </p>
 
-          {idop == "" ? (
+          {idop === "" ? (
             <IconButton
               onClick={handleValidateReservation}
-              disabled={isLoading}
-              isLoading={isLoading}
+              disabled={isButtonLoading}
+              isLoading={isButtonLoading}
               color="red"
               className="mt-4"
             >
@@ -108,20 +152,45 @@ export default function TicketConfirmation(props) {
             </IconButton>
           ) : (
             <IconButton
-              onClick={() =>
-                window.open(
-                  `https://www.payfip.gouv.fr/tpa/paiementws.web?idop=${idop}`,
-                  "_blank"
-                )
-              }
-              disabled={isLoading}
-              isLoading={isLoading}
+              onClick={() => {
+                setIsGlobalLoading(true); // 👈 pour afficher le vrai loader
+                window.location.href = `https://www.payfip.gouv.fr/tpa/paiementws.web?idop=${idop}`;
+              }}
+              disabled={isButtonLoading}
+              isLoading={isButtonLoading}
               color="green"
               className="mt-4"
             >
               Réessayer le paiement sur Payfip
             </IconButton>
           )}
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (errorCode === 404) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md mx-auto p-6 bg-white shadow border border-red-300 rounded-lg mt-4"
+      >
+        <div className="text-center">
+          <motion.div
+            initial={{ rotate: 0, scale: 0 }}
+            animate={{ rotate: [0, -10, 10, -10, 10, 0], scale: 1 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex rounded-full bg-red-200 p-2 mb-3"
+          >
+            <AlertCircle className="h-10 w-10 text-red-700" />
+          </motion.div>
+          <h2 className="text-xl font-bold">Dossier non trouvée</h2>
+          <p className="mt-2 text-sm">
+            Erreur 404 : La réservation n'a pas été trouvée. Veuillez vérifier
+            le lien ou contacter le support.
+          </p>
         </div>
       </motion.div>
     );
@@ -209,7 +278,7 @@ export default function TicketConfirmation(props) {
 
       <div className="flex justify-end mt-6">
         <button
-          onClick={() => console.log("Billet téléchargé")}
+          onClick={() => handleDownloadTickets()}
           className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
         >
           Télécharger les billets
