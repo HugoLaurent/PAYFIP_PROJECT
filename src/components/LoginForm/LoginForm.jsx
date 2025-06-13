@@ -79,11 +79,18 @@ export default function LoginForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mail: email, password }),
+        credentials: "include",
       });
 
       if (res.ok) {
-        Navigate("/dashboard");
+        const data = await res.json();
+        const token = data.token;
+        if (token) {
+          localStorage.setItem("authToken", token); // ou sessionStorage, selon besoin
+        }
+
         setSuccess(true);
+        Navigate("/dashboard");
       } else {
         const data = await res.json();
         setError(data.error || "Mot de passe incorrect.");

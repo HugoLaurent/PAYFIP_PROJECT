@@ -82,7 +82,7 @@ export default function TicketConfirmation(props) {
   };
 
   const handleDownloadTickets = async () => {
-    const res = await fetch("/api/test", {
+    const res = await fetch("/api/telecharger-billets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ confirmationNumber: confirmationNumber }),

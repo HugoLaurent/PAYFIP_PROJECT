@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import { Html5Qrcode } from "html5-qrcode";
 import { CheckCircle, XCircle, ScanLine, Ticket } from "lucide-react";
 import { IconButton } from "@/components";
+import { useAuth } from "../../hooks";
 
 // Convertit un nombre 4D (secondes depuis minuit) en HH:MM:SS
 function formatHeure4D(seconds) {
@@ -16,10 +18,19 @@ function formatHeure4D(seconds) {
 }
 
 export default function Dashboard() {
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
   const [scanResult, setScanResult] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [recentTickets, setRecentTickets] = useState([]);
   const qrReaderRef = useRef(null);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/login");
+    }
+  }, [loading, isAuthenticated]);
 
   const handleStartScan = () => {
     setIsScanning(true);
@@ -87,6 +98,8 @@ export default function Dashboard() {
       }
     });
   }, [isScanning]);
+
+  if (loading || !isAuthenticated) return null;
 
   return (
     <main className="flex flex-col items-center gap-8 max-w-lg mx-auto py-8">
