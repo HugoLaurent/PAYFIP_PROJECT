@@ -12,7 +12,7 @@ export default function useAuth() {
     if (token) {
       const checkAuth = async () => {
         try {
-          const response = await fetch("/api/test", {
+          const response = await fetch("/api/check-token", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

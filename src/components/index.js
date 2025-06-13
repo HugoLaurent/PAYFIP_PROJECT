@@ -14,3 +14,5 @@ export { default as TicketConfirmation } from "./TicketConfirmation/TicketConfir
 export { default as LoginForm } from "./LoginForm/LoginForm";
 export { default as FeedbackPayfip } from "./FeedbackPayfip/FeedbackPayfip";
 export { default as Loader } from "./Loader/Loader";
+export { default as QrScanner } from "./QrScanner/QrScanner";
+export { default as TicketByAgent } from "./TicketByAgent/TicketByAgent";

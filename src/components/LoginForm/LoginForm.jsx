@@ -8,7 +8,6 @@ export default function LoginForm() {
   const Navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [step, setStep] = useState(0); // 0: envoi code, 1: vérification code, 2: mot de passe
-  const [generatedCode, setGeneratedCode] = useState("");
   const [codeInput, setCodeInput] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,8 +35,7 @@ export default function LoginForm() {
       if (!res.ok) throw new Error();
 
       // pour démo
-      const fakeCode = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedCode(fakeCode);
+
       setStep(1);
     } catch (err) {
       setError("Erreur lors de l'envoi. Réessayez.");
@@ -79,7 +77,6 @@ export default function LoginForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mail: email, password }),
-        credentials: "include",
       });
 
       if (res.ok) {
