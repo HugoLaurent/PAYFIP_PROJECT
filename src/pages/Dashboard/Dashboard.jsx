@@ -1,53 +1,59 @@
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
-import { ScanLine, ShoppingCart, Ticket, Euro } from "lucide-react";
-import { IconButton, QrScanner, TicketByAgent } from "@/components";
-import useAuth from "../../hooks/useAuth";
+import { ScanLine, ShoppingCart, Ticket } from "lucide-react";
+import { IconButton, QrScanner, AgentTicketForm } from "@/components"; // ⬅️ BookingFlow à importer
 
 export default function Dashboard() {
-  // const { isAuthenticated, loading } = useAuth;
-  // const navigate = useNavigate();
-  const [currentView, setCurrentView] = useState("menu"); // 'menu', 'scanner', 'purchase'
-  const [data, setData] = useState([]);
-
-  const fetchDataTickets = async () => {
-    try {
-      const authToken = localStorage.getItem("authToken");
-      const response = await fetch("/api/test", {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      if (!response.ok)
-        throw new Error("Erreur lors de la récupération des tickets");
-      const data = await response.json();
-      console.log(data);
-
-      setData(data);
-    } catch (error) {
-      console.error("Erreur:", error);
-      return [];
-    }
-  };
-
-  // useEffect(() => {
-  //   if (!isAuthenticated && !loading) {
-  //     navigate("/login");
-  //   }
-  // }, [isAuthenticated, loading, navigate]);
+  const { serviceId } = useParams();
+  const [currentView, setCurrentView] = useState("menu");
+  const [stepAchat, setStepAchat] = useState(0); // ⬅️ pour le flow d’achat
+  const [service, setService] = useState(null);
 
   useEffect(() => {
-    fetchDataTickets();
-  }, []);
+    const fetchService = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const res = await fetch("/api/test", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        const found = data.services.find((s) => s.id.toString() === serviceId);
+        setService(found);
+        console.log("Service chargé :", service);
+      } catch (err) {
+        console.error("Erreur chargement service", err);
+      }
+    };
 
-  if (currentView === "scanner") {
+    fetchService();
+  }, [serviceId]);
+
+  if (!service)
+    return <div className="text-center py-20">Chargement du service...</div>;
+
+  if (currentView === "scanner")
     return <QrScanner onBackToMenu={() => setCurrentView("menu")} />;
-  }
 
-  if (currentView === "purchase") {
-    return <TicketByAgent onBackToMenu={() => setCurrentView("menu")} />;
-  }
+  if (currentView === "purchase")
+    return (
+      <div className="max-w-xl mx-auto py-8 px-4">
+        <button
+          onClick={() => {
+            setCurrentView("menu");
+            setStepAchat(0);
+          }}
+          className="text-blue-600 underline mb-4"
+        >
+          ← Retour au menu
+        </button>
+        <AgentTicketForm
+          tarifs={service?.prix}
+          serviceId={service?.id} // ⬅️ nécessaire
+          onBack={() => setCurrentView("menu")}
+        />
+      </div>
+    );
 
   return (
     <main className="flex flex-col items-center gap-8 max-w-lg mx-auto py-8 px-4">
@@ -60,7 +66,7 @@ export default function Dashboard() {
         <div className="mb-6">
           <div className="text-6xl mb-4">🎫</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Ticket Manager
+            {service.titre}
           </h1>
           <p className="text-gray-600">
             Gérez vos billets et validez les entrées
@@ -82,7 +88,6 @@ export default function Dashboard() {
         >
           Scanner un QR Code
         </IconButton>
-
         <IconButton
           icon={ShoppingCart}
           onClick={() => setCurrentView("purchase")}
@@ -103,18 +108,17 @@ export default function Dashboard() {
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <Ticket className="w-8 h-8 text-green-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-600">89</div>
-            <div className="text-xs text-gray-600">Tickets attendues</div>
+            <div className="text-xs text-gray-600">Tickets attendus</div>
           </div>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <ScanLine className="w-8 h-8 text-blue-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-blue-600">154</div>
             <div className="text-xs text-gray-600">Tickets scannés</div>
           </div>
-
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
             <Ticket className="w-8 h-8 text-purple-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-purple-600">182</div>
-            <div className="text-xs text-gray-600">Total ticket</div>
+            <div className="text-xs text-gray-600">Total tickets</div>
           </div>
         </div>
       </Motion.div>

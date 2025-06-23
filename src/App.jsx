@@ -1,7 +1,14 @@
 import { Routes, Route, useNavigate } from "react-router";
 import { useState } from "react";
 import "./App.css";
-import { Home, Dashboard, Legal, Page404, Error500 } from "@/pages";
+import {
+  Home,
+  Dashboard,
+  Legal,
+  Page404,
+  Error500,
+  PreDashboard,
+} from "@/pages";
 import {
   Header,
   FormContainer,
@@ -28,7 +35,8 @@ function App() {
             element={<FormContainer setServiceData={setServiceData} />}
           />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<PreDashboard />} />
+          <Route path="/dashboard/:serviceId" element={<Dashboard />} />
           <Route path="/test" element={<Test />} />
           <Route path="/mentions-legales" element={<Legal />} />
           <Route path="/feedback" element={<TicketConfirmation />} />
